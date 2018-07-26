@@ -24,15 +24,14 @@ sigma = zeros(1, size(X, 2));
 %               each feature. 
 %
 % Hint: You might find the 'mean' and 'std' functions useful.
-%       
+%   
 
+mu = mean(X);
+sigma = std(X);
 
-
-
-
-
-
-
+for i = 1 : size(X, 2)
+    X(:, i) = (X(:, i) - mu(i)) / sigma(i);
+end
 
 % ============================================================
 
