@@ -1,4 +1,4 @@
-function [J grad] = nnCostFunction(nn_params, ...
+  function [J grad] = nnCostFunction(nn_params, ...
                                    input_layer_size, ...
                                    hidden_layer_size, ...
                                    num_labels, ...
@@ -68,9 +68,14 @@ a3 = sigmoid(a2 * Theta2');
 
 yVec = zeros(m, size(a3, 2));
 yVec(sub2ind(size(yVec), (1:m)', y)) = 1;
+JNor = - (yVec .* log(a3) + (1 - yVec) .* log(1 - a3));
 
-JRes = - (yVec .* log(a3) + (1 - yVec) .* log(1 - a3));
-J = sum(sum(JRes)) / m;
+Theta1M = sum(sum(Theta1(:, 2:end) .^ 2));
+Theta2M = sum(sum(Theta2(:, 2:end) .^ 2));
+
+J = (sum(sum(JNor)) + (lambda * (Theta1M + Theta2M) / 2)) / m;
+
+
 
 % -------------------------------------------------------------
 
