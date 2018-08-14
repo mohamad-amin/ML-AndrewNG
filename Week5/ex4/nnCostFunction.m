@@ -62,10 +62,15 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-dX = [ones(m, 1) X];
-a2 = [ones(m, 1) sigmoid(dX * Theta1')];
-a3 = sigmoid(a2 * Theta2');
+a1 = X;
+a1_a = [ones(m, 1) a1];
+z2 = a1_a * Theta1';
+a2 = sigmoid(z2);
+a2_a = [ones(m, 1) a2];
+z3 = a2_a * Theta2';
+a3 = sigmoid(z3);
 
+% This is ok by chance, look at zeros ;) :D
 yVec = zeros(m, size(a3, 2));
 yVec(sub2ind(size(yVec), (1:m)', y)) = 1;
 JNor = - (yVec .* log(a3) + (1 - yVec) .* log(1 - a3));
@@ -75,7 +80,35 @@ Theta2M = sum(sum(Theta2(:, 2:end) .^ 2));
 
 J = (sum(sum(JNor)) + (lambda * (Theta1M + Theta2M) / 2)) / m;
 
+D1 = zeros(size(Theta1));
+D2 = zeros(size(Theta2));
 
+for t=1:m
+    
+    a1 = X(t, :)';
+    a1_a = [1; a1];
+    z2 = Theta1 * a1_a; 
+    a2 = sigmoid(z2);
+    a2_a = [1; a2];
+    z3 = Theta2 * a2_a;
+    a3 = sigmoid(z3);
+    
+    delta3 = a3 - yVec(t, :)';
+    delta2 = Theta2' * delta3 .* [1; sigmoidGradient(z2)]; % Todo: check here
+    delta2 = delta2(2:end);
+    
+    D1 = D1 + delta2 * a1_a';
+    D2 = D2 + delta3 * a2_a';
+    
+end
+
+Theta1_reg = lambda * Theta1;
+Theta2_reg = lambda * Theta2;
+Theta1_reg(:, 1) = 0;
+Theta2_reg(:, 1) = 0;
+
+Theta1_grad = (D1 + Theta1_reg) / m;
+Theta2_grad = (D2 + Theta2_reg) / m;
 
 % -------------------------------------------------------------
 
